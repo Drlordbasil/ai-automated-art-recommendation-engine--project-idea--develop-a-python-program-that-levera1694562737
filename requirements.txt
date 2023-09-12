@@ -1,0 +1,15 @@
+The package requirements for this Python program are:
+
+- requests
+- bs4 (BeautifulSoup)
+- sklearn.feature_extraction.text (TfidfVectorizer)
+- sklearn.metrics.pairwise (cosine_similarity)
+- numpy
+
+You can install these packages using pip by running the following command:
+
+```
+pip install requests bs4 scikit-learn numpy
+```
+
+Note that scikit-learn is the package that provides the sklearn module.
