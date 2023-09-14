@@ -12,7 +12,7 @@ class Artwork:
         self.artist = artist
         self.genre = genre
         self.description = description
-    
+
     def display_details(self):
         print("Title:", self.title)
         print("Artist:", self.artist)
@@ -29,13 +29,25 @@ class ArtRecommender:
 
     def scrape_artwork_data(self, url):
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        artwork_titles = [title.text.strip() for title in soup.find_all('h2', class_='artwork-title')]
-        artwork_artists = [artist.text.strip() for artist in soup.find_all('h3', class_='artwork-artist')]
-        artwork_genres = [genre.text.strip() for genre in soup.find_all('a', class_='artwork-genre')]
-        artwork_descriptions = [description.text.strip() for description in soup.find_all('p', class_='artwork-description')]
+        soup = BeautifulSoup(response.text, "html.parser")
+        artwork_titles = [
+            title.text.strip() for title in soup.find_all("h2", class_="artwork-title")
+        ]
+        artwork_artists = [
+            artist.text.strip()
+            for artist in soup.find_all("h3", class_="artwork-artist")
+        ]
+        artwork_genres = [
+            genre.text.strip() for genre in soup.find_all("a", class_="artwork-genre")
+        ]
+        artwork_descriptions = [
+            description.text.strip()
+            for description in soup.find_all("p", class_="artwork-description")
+        ]
 
-        for title, artist, genre, description in zip(artwork_titles, artwork_artists, artwork_genres, artwork_descriptions):
+        for title, artist, genre, description in zip(
+            artwork_titles, artwork_artists, artwork_genres, artwork_descriptions
+        ):
             artwork = Artwork(title, artist, genre, description)
             self.artwork_data.append(artwork)
 
@@ -44,7 +56,9 @@ class ArtRecommender:
         self.user_profiles[username] = preferences.split(",")
 
     def generate_artwork_vectors(self):
-        artwork_texts = [artwork.title + " " + artwork.description for artwork in self.artwork_data]
+        artwork_texts = [
+            artwork.title + " " + artwork.description for artwork in self.artwork_data
+        ]
         self.artwork_vectors = self.vectorizer.fit_transform(artwork_texts).todense()
 
     def recommend_artwork(self, username):
@@ -54,13 +68,17 @@ class ArtRecommender:
 
         user_preferences = self.user_profiles[username]
 
-        user_vector = self.vectorizer.transform([' '.join(user_preferences)]).todense()
+        user_vector = self.vectorizer.transform([" ".join(user_preferences)]).todense()
 
-        similarity_scores = cosine_similarity(user_vector, self.artwork_vectors).flatten()
+        similarity_scores = cosine_similarity(
+            user_vector, self.artwork_vectors
+        ).flatten()
 
         sorted_indices = np.argsort(similarity_scores)[::-1]
 
-        recommended_indices = random.sample(sorted_indices.tolist(), min(5, len(sorted_indices)))
+        recommended_indices = random.sample(
+            sorted_indices.tolist(), min(5, len(sorted_indices))
+        )
 
         print(f"Recommended artworks for {username}:")
         for index in recommended_indices:
